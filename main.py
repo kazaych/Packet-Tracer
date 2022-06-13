@@ -48,6 +48,6 @@ while True:
         else:
             print('mapped', pck)
             print(150 * '-')
-    if keyboard.is_pressed('q'):
+    if keyboard.is_pressed('q'): # press q to stop socket
         print('q has pressed end of program')
         break
