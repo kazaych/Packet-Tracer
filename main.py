@@ -28,8 +28,12 @@ def buffer_cut(raw, cat):  # take data from buffer only if It's not only one ast
 print('Input Asterix cat. num')
 input_cat = str(hex(int(input())))
 cat_num = input_cat[2:]
+print('Input port UDP')
+udp_port = int(input())
+
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('', 4001))  # open socket
+sock.bind(('', udp_port))  # open socket
 raw_buf = ''  # buffering data if not one cat  packet in eth frame
 while True:
     data = sock.recv(1515)
