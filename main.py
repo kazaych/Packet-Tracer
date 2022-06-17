@@ -40,7 +40,7 @@ while True:
     raw_str_buf = str(data.hex())
     pck, flg = uncut_buf(raw_str_buf, cat_num)
     if flg == 1:  # if in uncut_buf not one cat packet ++ to raw buf
-        raw_buf = raw_buf + pck
+        raw_buf = raw_buf + pck  # add buffer
     else:
         if raw_buf != '':
             packets = buffer_cut(raw_buf, cat_num)
