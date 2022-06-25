@@ -1,52 +1,105 @@
-import socket
-import keyboard
 import UDP_socket
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-    def uncut_buf(self, raw, cat):
-        if raw[0:2] == cat:
-            p_len = int(hex(int(raw[2:6], 16)), 16) * 2  # calc len of packet
-            pck_cut = raw[0:p_len]
-            if (len(raw) - len(pck_cut)) > 0:
-                  return raw, 1
-            else:
-                 return pck_cut, 0
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(1083, 873)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.portbutton = QtWidgets.QPushButton(self.centralwidget)
+        self.portbutton.setGeometry(QtCore.QRect(740, 760, 321, 61))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.portbutton.setFont(font)
+        self.portbutton.setObjectName("portbutton")
+        self.portbutton.clicked.connect(self.openport)
+        self.dle = QtWidgets.QCheckBox(self.centralwidget)
+        self.dle.setGeometry(QtCore.QRect(50, 810, 70, 17))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.dle.setFont(font)
+        self.dle.setObjectName("dle")
+        self.tcp = QtWidgets.QCheckBox(self.centralwidget)
+        self.tcp.setGeometry(QtCore.QRect(130, 810, 51, 17))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.tcp.setFont(font)
+        self.tcp.setObjectName("tcp")
+        self.udp = QtWidgets.QCheckBox(self.centralwidget)
+        self.udp.setGeometry(QtCore.QRect(220, 810, 70, 17))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.udp.setFont(font)
+        self.udp.setObjectName("udp")
+        self.portnum = QtWidgets.QLineEdit(self.centralwidget)
+        self.portnum.setGeometry(QtCore.QRect(170, 770, 91, 21))
+        self.portnum.setObjectName("portnum")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(50, 730, 371, 21))
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.label.setFont(font)
+        self.label.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        self.label.setAutoFillBackground(False)
+        self.label.setTextFormat(QtCore.Qt.TextFormat.AutoText)
+        self.label.setIndent(-8)
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(50, 770, 111, 21))
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.listWidget_out = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget_out.setGeometry(QtCore.QRect(25, 21, 1041, 731))
+        self.listWidget_out.setObjectName("listWidget_out")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1083, 21))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.portbutton.setText(_translate("MainWindow", "Open port"))
+        self.dle.setText(_translate("MainWindow", "DLE"))
+        self.tcp.setText(_translate("MainWindow", "TCP"))
+        self.udp.setText(_translate("MainWindow", "UDP"))
+        self.label.setText(_translate("MainWindow", "Parameters"))
+        self.label_2.setText(_translate("MainWindow", "Port number"))
+
+    def addtooutput(self, data):
+        self.listWidget_out.addItem(data)
+
+    def takeportnum(self):
+        port = self.portnum.text()
+        return port
+
+    def openport(self):
+        port = int(self.takeportnum())
+        sock = UDP_socket.UdpSocket(port)
+        raw = sock.sockopen()
+        if raw == '':
+            self.listWidget_out.addItem(QtWidgets.QListWidgetItem('Port is empty'))
         else:
-             return raw, 1
-
-    def buffer_cut(self, raw, cat):  #
-        pck_list = []
-        while len(raw) > 0:
-            pck_begin = raw.find(cat)
-            pck_len = int(hex(int(raw[pck_begin + 2: pck_begin + 6], 16)), 16) * 2  # calc len of packet
-             frame = raw[pck_begin:pck_len]
-             pck_list.append(frame)
-             raw = raw[pck_len:]  # cut frame from raw
-        return pck_list
+            raw_out = QtWidgets.QListWidgetItem(str.upper(raw.hex()))
+            self.listWidget_out.addItem(raw_out)
 
 
-input_cat = str(hex(int(input())))[2:]
-port = int(input())
-raw_buf = ''  # buffering data if not one cat  packet in eth frame
-
-data = UdpSocket(4001)
-data.sock =
-while True:
-    raw_str_buf = str(data.hex())
-    pck, flg = uncut_buf(raw_str_buf, cat_num)
-    if flg == 1:  # if in uncut_buf not one cat packet ++ to raw buf
-        raw_buf = raw_buf + pck  # add buffer
-    else:
-        if raw_buf != '':
-            packets = buffer_cut(raw_buf, cat_num)
-            if packets != 0:
-                for packet in packets:
-                    print('mapped from buffer', packet)
-                    print(150 * '-')
-            raw_buf = ''
-        else:
-            print('mapped', pck)
-            print(150 * '-')
-    if keyboard.is_pressed('q'):  # press q to stop socket
-        print('q has pressed end of program')
-        break
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec())

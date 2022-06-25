@@ -13,8 +13,3 @@ class UdpSocket:
         self.sock.bind(('', self.prt))  # open socket
         data = self.sock.recv(1500)
         return data
-
-
-prt = UdpSocket(4016)
-raw = prt.sockopen()
-print(raw)
