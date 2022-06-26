@@ -7,9 +7,9 @@ class UdpSocket:
         self.dle_s = dle_s
         self.dle_e = dle_e
         self.prt = prt
-
-    def sockopen(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('', self.prt))  # open socket
-        data = self.sock.recv(1500)
+
+    def datarcv(self):
+        data = self.sock.recv(4096)
         return data

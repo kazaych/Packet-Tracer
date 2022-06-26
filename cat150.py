@@ -1,9 +1,6 @@
-import socket
-import keyboard
 import UDP_socket
 
-class Asterixbuff:
-
+class cat150():
     def uncut_buf(self, raw, cat):
         if raw[0:2] == cat:
             p_len = int(hex(int(raw[2:6], 16)), 16) * 2  # calc len of packet
@@ -14,7 +11,6 @@ class Asterixbuff:
                  return pck_cut, 0
         else:
              return raw, 1
-
     def buffer_cut(self, raw, cat):  #
         pck_list = []
         while len(raw) > 0:
@@ -30,9 +26,12 @@ input_cat = str(hex(int(input())))[2:]
 port = int(input())
 raw_buf = ''  # buffering data if not one cat  packet in eth frame
 
-data = UdpSocket(4001)
-data.sock =
+
+sock = UDP_socket.UdpSocket(4016)
+
+
 while True:
+    data = sock.datarcv()
     raw_str_buf = str(data.hex())
     pck, flg = uncut_buf(raw_str_buf, cat_num)
     if flg == 1:  # if in uncut_buf not one cat packet ++ to raw buf
