@@ -237,7 +237,7 @@ class Ui_Astracer(object):
         th.start()
 
 
-    def take_raw_data(self):
+    def take_raw_data(self):  # get data from udp socket
             while True:
                 try:
                     self.port = int(self.take_portnum())
