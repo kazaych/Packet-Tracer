@@ -1,4 +1,6 @@
 import threading
+from operator import eq
+
 from PyQt6 import QtCore, QtGui, QtWidgets
 import UDP_socket
 
@@ -91,7 +93,7 @@ class Ui_Astracer(object):
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap("C:\\Users\\Kazay\\PycharmProjects\\ASTERIX_Packet_Tracer\\../../Downloads/ethernet.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.openport.setIcon(icon1)
-        self.openport.setCheckable(False)
+        self.openport.setCheckable(True)
         self.openport.setChecked(False)
         self.openport.setAutoRepeat(False)
         self.openport.setAutoDefault(False)
@@ -173,7 +175,6 @@ class Ui_Astracer(object):
         self.statusbar = QtWidgets.QStatusBar(Astracer)
         self.statusbar.setObjectName("statusbar")
         Astracer.setStatusBar(self.statusbar)
-
         self.retranslateUi(Astracer)
         QtCore.QMetaObject.connectSlotsByName(Astracer)
         self.connect_functions()
@@ -202,25 +203,14 @@ class Ui_Astracer(object):
 
     def connect_functions(self):
         self.openport.clicked.connect(self.open_port_thread)
+        self.openport.clicked.connect(self.check_btn_state)
 
+    def check_btn_state(self):
+        if self.openport.isChecked():
+            self.openport.setText('Close')
+        else:
+            self.openport.setText('Open')
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label_3.setText(_translate("MainWindow", "DECODED DATA"))
-        self.label_2.setText(_translate("MainWindow", "Port"))
-        self.comboBox.setItemText(0, _translate("MainWindow", "UDP"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "TCP SERVER"))
-        self.comboBox.setItemText(2, _translate("MainWindow", "TCP CLIENT"))
-        self.openport.setText(_translate("MainWindow", "Open "))
-        self.label_5.setText(_translate("MainWindow", "BYTE STAFFING"))
-        self.comboBox_3.setItemText(0, _translate("MainWindow", "RAW"))
-        self.comboBox_3.setItemText(1, _translate("MainWindow", "DLE"))
-        self.comboBox_3.setItemText(2, _translate("MainWindow", "DLE + CRC"))
-        self.label_4.setText(_translate("MainWindow", "ASTERIX CATEGORY"))
-        self.comboBox_2.setItemText(0, _translate("MainWindow", "CAT 150"))
-        self.comboBox_2.setItemText(1, _translate("MainWindow", "CAT 62"))
-        self.label.setText(_translate("MainWindow", "RAW DATA"))
 
     def add_too_list(self, data):
         line = str.upper(data.hex(' ', 1))
@@ -229,21 +219,23 @@ class Ui_Astracer(object):
             self.listWidget.scrollToBottom()
 
     def take_portnum(self):
-        port = self.portnum.text()
-        return port
+        try:
+            port = self.portnum.text()
+            return port
+        except ValueError:
+            pass
 
     def open_port_thread(self):
         th = threading.Thread(target=self.take_raw_data, args=())
         th.start()
 
-
     def take_raw_data(self):
-            while True:
-                try:
-                    self.port = int(self.take_portnum())
-                    self.sock = UDP_socket.UdpSocket(self.port)
-                except OSError:
-                    pass
+             try:
+                self.port = int(self.take_portnum())
+                self.sock = UDP_socket.UdpSocket(self.port)
+             except OSError:
+                   pass
+             while self.openport.isChecked():
                 self.add_too_list(self.sock.datarcv())
 
 
@@ -255,6 +247,7 @@ if __name__ == "__main__":
     ui.setupUi(Astracer)
     Astracer.show()
     sys.exit(app.exec())
+
 
 
 
