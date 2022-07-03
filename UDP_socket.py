@@ -11,5 +11,5 @@ class UdpSocket:
         self.sock.bind(('', self.prt))  # open socket
 
     def datarcv(self):
-        data = self.sock.recv(4096)
+        data = self.sock.recv(4096) # get 4096 bytes from socket
         return data
