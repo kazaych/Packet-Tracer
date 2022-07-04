@@ -3,7 +3,7 @@ from operator import eq
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import UDP_socket
-
+from DLE_RAW_CRC import DLE_Packet
 
 class Ui_Astracer(object):
 
@@ -84,6 +84,7 @@ class Ui_Astracer(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.horizontalLayout_3.addWidget(self.comboBox)
+        # OpenSocket button
         self.openport = QtWidgets.QPushButton(self.splitter)
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -99,6 +100,8 @@ class Ui_Astracer(object):
         self.openport.setAutoDefault(False)
         self.openport.setFlat(False)
         self.openport.setObjectName("openport")
+        self.openport.setStyleSheet("background-color:rgb(102,255,102)")
+        # -------------------------------------------------------------------
         self.verticalLayout_3.addWidget(self.splitter)
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
         self.verticalLayout_3.addItem(spacerItem)
@@ -208,8 +211,10 @@ class Ui_Astracer(object):
     def check_btn_state(self):
         if self.openport.isChecked():
             self.openport.setText('Close')
+            self.openport.setStyleSheet("background-color:rgb(255,102,102)")
         else:
             self.openport.setText('Open')
+            self.openport.setStyleSheet("background-color:rgb(102,255,102)")
 
 
     def add_too_list(self, data):
@@ -217,6 +222,26 @@ class Ui_Astracer(object):
         self.listWidget.addItem(line)
         if self.AutoscrollRaw.isChecked():
             self.listWidget.scrollToBottom()
+        if self.listWidget.count() >= 100:
+            self.listWidget.repaint()
+
+
+    def add_too_decode_List(self, data):
+        line = str.upper(data.hex())
+        self.pack_without_dle = DLE_Packet()
+        try:
+            pck_cut, cut_buffer = self.pack_without_dle.is_self_packet(line)
+            if cut_buffer is not None:
+                self.listWidget_2.addItem(cut_buffer)
+                self.listWidget_2.addItem(pck_cut)
+            else:
+                self.listWidget_2.addItem(pck_cut)
+        except TypeError:
+            pass
+        if self.AutoscrollDecoded.isChecked():
+            self.listWidget.scrollToBottom()
+        if self.listWidget_2.count() >= 100:
+            self.listWidget_2.repaint()
 
     def take_portnum(self):
         try:
@@ -236,7 +261,9 @@ class Ui_Astracer(object):
              except OSError:
                    pass
              while self.openport.isChecked():
-                self.add_too_list(self.sock.datarcv())
+                raw = self.sock.datarcv()
+                self.add_too_list(raw)
+                self.add_too_decode_List(raw)
 
 
 if __name__ == "__main__":
